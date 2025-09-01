@@ -133,6 +133,9 @@ quotes = [
 quote = random.choice(quotes)
 print("Got Quote")
 
+print("DEBUG unsplashAccessKey:", unsplashAccessKey is not None)
+print("DEBUG sender:", sender)
+
 # Get Image
 headers = {
     "Authorization": f"Client-ID {unsplashAccessKey}"
