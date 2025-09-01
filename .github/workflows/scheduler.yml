@@ -3,7 +3,7 @@ name: Scheduled Email Job
 on:
   schedule:
     - cron: "0 2 * * *"   # 07:30 AM IST (02:00 UTC)
-    - cron: "30 6 * * *"   # 07:30 AM IST (02:00 UTC)
+    - cron: "30 6 * * *"   # 12:00 PM IST 
   workflow_dispatch:       # allows manual trigger from Actions tab
 
 jobs:
@@ -32,3 +32,11 @@ jobs:
 
       - name: Run script
         run: python src/main.py
+
+      - name: Debug secrets
+        run: |
+          echo "EMAIL_USER: ${{ secrets.EMAIL_USER }}"
+          echo "EMAIL_PASS: ${{ secrets.EMAIL_PASS }}"
+          echo "UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}"
+          echo "TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}"
+
