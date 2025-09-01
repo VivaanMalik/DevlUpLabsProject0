@@ -30,9 +30,6 @@ jobs:
         run: |
           pip install -r requirements.txt || pip install requests python-dotenv pillow numpy
 
-      - name: Run script
-        run: python src/main.py
-
       - name: Debug secrets
         run: |
           echo "EMAIL_USER: ${{ secrets.EMAIL_USER }}"
@@ -40,3 +37,5 @@ jobs:
           echo "UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}"
           echo "TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}"
 
+      - name: Run script
+        run: python src/main.py
