@@ -1,5 +1,22 @@
 import random
 import requests
+import smtplib
+from email.mime.text import MIMEText
+import os
+from dotenv import load_dotenv
+from io import BytesIO
+from PIL import Image
+
+load_dotenv()
+
+sender = os.getenv("EMAIL_USER")
+receiver = os.getenv("TEMP_RECIEVER")
+password = os.getenv("EMAIL_PASS")
+unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
+imageURL = os.getenv("https://api.unsplash.com/photos/random?query=sleep&orientation=landscape")
+
+url = "https://api.unsplash.com/photos/random"
+retryCount = 3
 
 quotes = [
     "Procrastinate now,\npay later.",
@@ -110,4 +127,49 @@ quotes = [
     "Pause life,\nnap often."
 ]
 
+#  Get Quote
 quote = random.choice(quotes)
+
+# Get Image
+headers = {
+    "Authorization": f"Client-ID {unsplashAccessKey}"
+}
+params = {
+    "query": "sleep",
+    "orientation": "landscape"
+}
+
+image_url = None
+response = requests.get(url, headers=headers, params=params)
+for _i in range(retryCount):
+    if response.status_code == 200:
+        data = response.json()
+        image_url = data["urls"]["raw"]  # raw, full, regular, small, thumb
+        print("Random sleep landscape image URL:", image_url)
+        break
+    if response.status_code != 200:
+        exit
+    print("Error:", response.status_code, response.text)
+
+# Save Image
+response = requests.get(image_url)
+img = None
+for _i in range(retryCount):
+    if response.status_code == 200:
+        img = Image.open(BytesIO(response.content))
+        img.show()
+        break
+    if response.status_code != 200:
+        exit
+    print("Error:", response.status_code, response.text)
+
+# Edit Image
+
+msg = MIMEText("Hello! This is a test email.\n\n"+quote)
+msg["Subject"] = "Test"
+msg["From"] = sender
+msg["To"] = receiver
+
+with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+    server.login(sender, password)
+    # server.send_message(msg)
