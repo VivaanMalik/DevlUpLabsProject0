@@ -2,8 +2,9 @@ name: Scheduled Job
 
 on:
   schedule:
-    - cron: "0,41 * * * *"  # runs every 30 minutes (00 and 30 minutes past each hour)
-  workflow_dispatch:         # optional: manual trigger
+    - cron: "0 2 * * *"   # runs at 02:00 UTC = 07:30 IST every day
+    - cron: "30 6 * * *"   # 12:00 IST
+  workflow_dispatch:       # optional: allows manual run
 
 jobs:
   run-script:
