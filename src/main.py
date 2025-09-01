@@ -17,7 +17,7 @@ receiver = os.getenv("TEMP_RECIEVER")
 password = os.getenv("EMAIL_PASS")
 unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
 imurlthing = os.getenv("IMAGE_URL")
-print(imurlthing)
+print("DEBUG: ", imurlthing)
 
 url = "https://api.unsplash.com/photos/random"
 retryCount = 3
