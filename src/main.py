@@ -131,6 +131,7 @@ quotes = [
 
 #  Get Quote
 quote = random.choice(quotes)
+print("Got Quote")
 
 # Get Image
 headers = {
@@ -152,6 +153,7 @@ for _i in range(retryCount):
     if response.status_code != 200:
         exit
     print("Error:", response.status_code, response.text)
+print("Got Image")
 
 # Save Image
 response = requests.get(image_url)
@@ -190,6 +192,7 @@ buffer = io.BytesIO()
 img.save(buffer, format="PNG")
 buffer.seek(0)
 img_str = base64.b64encode(buffer.read()).decode("utf-8")
+print("Edited Image")
 
 # Send mail
 part1 = MIMEText("Hello! This is a test email.\n\n" + quote)
@@ -218,8 +221,9 @@ alt.attach(part2)
 
 msg.attach(alt)
 msg.attach(part3)
-
+print("Prpped mail")
 
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
     server.login(sender, password)
     server.send_message(msg)
+print("Sent mail")
