@@ -1,11 +1,14 @@
+from email.mime.multipart import MIMEMultipart
 import random
 import requests
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import os
 from dotenv import load_dotenv
-from io import BytesIO
-from PIL import Image
+import io, base64
+from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 
 load_dotenv()
 
@@ -13,7 +16,6 @@ sender = os.getenv("EMAIL_USER")
 receiver = os.getenv("TEMP_RECIEVER")
 password = os.getenv("EMAIL_PASS")
 unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
-imageURL = os.getenv("https://api.unsplash.com/photos/random?query=sleep&orientation=landscape")
 
 url = "https://api.unsplash.com/photos/random"
 retryCount = 3
@@ -144,7 +146,7 @@ response = requests.get(url, headers=headers, params=params)
 for _i in range(retryCount):
     if response.status_code == 200:
         data = response.json()
-        image_url = data["urls"]["raw"]  # raw, full, regular, small, thumb
+        image_url = data["urls"]["regular"]  # raw, full, regular, small, thumb
         print("Random sleep landscape image URL:", image_url)
         break
     if response.status_code != 200:
@@ -156,20 +158,68 @@ response = requests.get(image_url)
 img = None
 for _i in range(retryCount):
     if response.status_code == 200:
-        img = Image.open(BytesIO(response.content))
-        img.show()
+        img = Image.open(io.BytesIO(response.content))
+        # img.show()
         break
     if response.status_code != 200:
         exit
     print("Error:", response.status_code, response.text)
 
 # Edit Image
+img_array = np.array(img)
+avg_color = tuple(np.average(img_array, axis=(0, 1)).astype(int))
+img_width, img_height = img.size
+midx = img_width / 2
+midy = img_height / 2
+text_color = (0, 0, 0)
+border_color = (255, 255, 255)
 
-msg = MIMEText("Hello! This is a test email.\n\n"+quote)
+if (avg_color[0]+avg_color[1]+avg_color[2]<128*3):
+    text_color = (255, 255, 255)
+    border_color = (0, 0, 0)
+
+draw = ImageDraw.Draw(img)
+font = None
+size_f = 100
+try:
+    font = ImageFont.truetype('times.ttf', size=size_f)
+except IOError:
+    font = ImageFont.load_default(size=size_f)
+draw.text((midx, midy), quote, fill=text_color, font=font, anchor="mm", align="center", stroke_width=5, stroke_fill=border_color)
+buffer = io.BytesIO()
+img.save(buffer, format="PNG")
+buffer.seek(0)
+img_str = base64.b64encode(buffer.read()).decode("utf-8")
+
+# Send mail
+part1 = MIMEText("Hello! This is a test email.\n\n" + quote)
+
+part2 = MIMEText(f"""
+<html>
+  <body>
+    <p>
+      Hi!<br>
+      <img src="cid:testimage">
+    </p>
+  </body>
+</html>
+""", "html")
+
+part3 = MIMEImage(buffer.getvalue(), _subtype="png")
+part3.add_header("Content-ID", "<testimage>")
+
+msg = MIMEMultipart('related')
 msg["Subject"] = "Test"
 msg["From"] = sender
 msg["To"] = receiver
+alt = MIMEMultipart('alternative')
+alt.attach(part1)
+alt.attach(part2)
+
+msg.attach(alt)
+msg.attach(part3)
+
 
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
     server.login(sender, password)
-    # server.send_message(msg)
+    server.send_message(msg)
