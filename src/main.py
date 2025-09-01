@@ -221,7 +221,7 @@ alt.attach(part2)
 
 msg.attach(alt)
 msg.attach(part3)
-print("Prpped mail")
+print("Prepped mail")
 
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
     server.login(sender, password)
