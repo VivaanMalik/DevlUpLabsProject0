@@ -26,10 +26,10 @@ def scrapeReddit(url):
     headers = {"User-Agent": "Mozilla/5.0"}
     for _i in range(retryCount):
         res = requests.get(url, headers=headers)
-        if response.status_code == 200:
+        if res.status_code == 200:
             break
-        if response.status_code != 200 and _i == retryCount:
-            print("Error:", response.status_code, response.text)
+        if res.status_code != 200 and _i == retryCount:
+            print("Error:", res.status_code, res.text)
             return None
     
     soup = BeautifulSoup(res.text, "html.parser")
@@ -279,7 +279,7 @@ part2 = MIMEText(f"""
         <h1>Its time to rest!</h1>
         <p>Kindly wait for image to load...</p>
         <hr>
-            <p><img src="cid:testimage", alt="Get better internet my guy."></p>
+            <p><img src="cid:testimage" alt="Get better internet my guy."></p>
         <hr>
         <h1>Top articles across reddit</h1>
             <hr>
