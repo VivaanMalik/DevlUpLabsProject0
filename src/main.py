@@ -262,7 +262,7 @@ linktext = f"<p style='color:#888;'>Digest generated at {datetime.now()}</p>"
 for i in range(len(SubredditData)):
     linktext+=f"<h2>{SubredditNames[i]}</h2>\n"
     for j in SubredditData[i]:
-        linktext += f""" 
+        linktext += f"""\
                     <h3>{j[0]}</h3>
                     <p>{j[1]}</p>
                     <a href="{j[2]}" style="{button_style}">Read More</a>
@@ -274,7 +274,7 @@ print("Got links")
 # Send mail
 part1 = MIMEText("Hello! This is a test email.\n\n" + quote)
 
-part2 = MIMEText(f"""
+part2 = MIMEText(f"""\
 <html>
     <body>
         <h1>Its time to rest!</h1>
