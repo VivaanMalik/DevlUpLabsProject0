@@ -258,7 +258,7 @@ SubredditNames = ["r/AmItheAsshole", "r/pettyrevenge", "r/relationships"]
 for Sr in Subreddits:
     SubredditData.append(scrapeReddit(Sr))
 
-linktext = ""
+linktext = f"<p style='color:#888;'>Digest generated at {datetime.now()}</p>"
 for i in range(len(SubredditData)):
     linktext+=f"<h2>{SubredditNames[i]}</h2>\n"
     for j in SubredditData[i]:
