@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import io, base64
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
@@ -17,10 +18,53 @@ receiver = os.getenv("TEMP_RECIEVER")
 password = os.getenv("EMAIL_PASS")
 unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
 imurlthing = os.getenv("IMAGE_URL")
-print("DEBUG: ", imurlthing)
 
 url = "https://api.unsplash.com/photos/random"
 retryCount = 3
+
+def scrapeReddit(url):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    for _i in range(retryCount):
+        res = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            break
+        if response.status_code != 200 and _i == retryCount:
+            print("Error:", response.status_code, response.text)
+            return None
+    
+    soup = BeautifulSoup(res.text, "html.parser")
+    posts = soup.find_all("div", {"class": "thing"}, limit=3)
+    
+    data = []
+    for post in posts:
+        title_tag = post.find("a", class_="title")
+        title = title_tag.get_text(strip=True) if title_tag else "No title"
+
+        post_url = title_tag['href'] if title_tag else None
+        if post_url and post_url.startswith("/r/"):
+            post_url = "https://old.reddit.com" + post_url
+
+        # Visit the post URL to get full text
+        description = "No description found"
+        if post_url:
+            res_post = requests.get(post_url, headers=headers)
+            if res_post.status_code == 200:
+                soup_post = BeautifulSoup(res_post.text, "html.parser")
+                usertext_divs = soup_post.find_all("div", class_="usertext-body")
+                if usertext_divs:
+                    # print(len(usertext_divs))
+                    usertext_div = usertext_divs[1]
+                    md_div = usertext_div.find("div", class_="md")
+                    if md_div:
+                        paragraphs = md_div.find_all("p")
+                        description = paragraphs[0].get_text(strip=True)
+                        if len(paragraphs)>1:
+                            description+="..."
+
+        post_url = post_url.replace("https://old", "https://www")
+
+        data.append([title, description, post_url])
+    return data
 
 quotes = [
     "Procrastinate now,\npay later.",
@@ -135,9 +179,6 @@ quotes = [
 quote = random.choice(quotes)
 print("Got Quote")
 
-print("DEBUG unsplashAccessKey:", unsplashAccessKey is not None)
-print("DEBUG sender:", sender)
-
 # Get Image
 headers = {
     "Authorization": f"Client-ID {unsplashAccessKey}"
@@ -155,15 +196,15 @@ for _i in range(retryCount):
         image_url = data["urls"]["regular"]  # raw, full, regular, small, thumb
         print("Random sleep landscape image URL:", image_url)
         break
-    if response.status_code != 200:
+    if response.status_code != 200 and _i == retryCount-1:
         exit
     print("Error:", response.status_code, response.text)
 print("Got Image")
 
 # Save Image
-response = requests.get(image_url)
 img = None
 for _i in range(retryCount):
+    response = requests.get(image_url)
     if response.status_code == 200:
         img = Image.open(io.BytesIO(response.content))
         # img.show()
@@ -187,29 +228,64 @@ if (avg_color[0]+avg_color[1]+avg_color[2]<128*3):
 
 draw = ImageDraw.Draw(img)
 font = None
-size_f = 100
+size_f = img.height//10
 try:
     font = ImageFont.truetype('times.ttf', size=size_f)
 except IOError:
     font = ImageFont.load_default(size=size_f)
-draw.text((midx, midy), quote, fill=text_color, font=font, anchor="mm", align="center", stroke_width=5, stroke_fill=border_color)
+draw.text((midx, midy), quote, fill=text_color, font=font, anchor="mm", align="center", stroke_width=size_f//20, stroke_fill=border_color)
 buffer = io.BytesIO()
 img.save(buffer, format="PNG")
 buffer.seek(0)
 img_str = base64.b64encode(buffer.read()).decode("utf-8")
 print("Edited Image")
 
+# Get links/embeds
+button_style = (
+    "display:inline-block;"
+    "padding:10px 20px;"
+    "background-color:#FF4500;"
+    "color:white;"
+    "text-decoration:none;"
+    "border-radius:5px;"
+    "font-weight:bold;"
+)
+
+SubredditData = []
+Subreddits = ["https://old.reddit.com/r/AmItheAsshole/top/?t=day", "https://old.reddit.com/r/pettyrevenge/top/?t=day", "https://old.reddit.com/r/relationships/top/?t=day"]
+SubredditNames = ["r/AmItheAsshole", "r/pettyrevenge", "r/relationships"]
+for Sr in Subreddits:
+    SubredditData.append(scrapeReddit(Sr))
+
+linktext = ""
+for i in range(len(SubredditData)):
+    linktext+=f"<h2>{SubredditNames[i]}</h2>\n"
+    for j in SubredditData[i]:
+        linktext += f""" 
+                    <h3>{j[0]}</h3>
+                    <p>{j[1]}</p>
+                    <a href={j[2]} style="{button_style}">Read More</a>
+                    <br>
+                    """
+    linktext+="\n<hr>\n"
+print("Got links")
+
 # Send mail
 part1 = MIMEText("Hello! This is a test email.\n\n" + quote)
 
 part2 = MIMEText(f"""
 <html>
-  <body>
-    <p>
-      Hi!<br>
-      <img src="cid:testimage">
-    </p>
-  </body>
+    <body>
+        <h1>Its time to rest!</h1>
+        <p>Kindly wait for image to load...</p>
+        <hr>
+            <p><img src="cid:testimage", alt="Get better internet my guy."></p>
+        <hr>
+        <h1>Top articles across reddit</h1>
+            <hr>
+            {linktext}
+        <br>
+    </body>
 </html>
 """, "html")
 
@@ -217,7 +293,7 @@ part3 = MIMEImage(buffer.getvalue(), _subtype="png")
 part3.add_header("Content-ID", "<testimage>")
 
 msg = MIMEMultipart('related')
-msg["Subject"] = "Test"
+msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
 msg["From"] = sender
 msg["To"] = receiver
 alt = MIMEMultipart('alternative')

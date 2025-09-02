@@ -2,7 +2,6 @@ name: Scheduled Email Job
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 07:30 AM IST (02:00 UTC)
     - cron: "30 6 * * *"   # 12:00 PM IST 
   workflow_dispatch:       # allows manual trigger from Actions tab
 
