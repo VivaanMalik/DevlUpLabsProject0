@@ -24,7 +24,13 @@ url = "https://api.unsplash.com/photos/random"
 retryCount = 3
 
 def scrapeReddit(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/124.0 Safari/537.36",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
     for _i in range(retryCount):
         res = requests.get(url, headers=headers)
         if res.status_code == 200:
@@ -195,7 +201,6 @@ for _i in range(retryCount):
     if response.status_code == 200:
         data = response.json()
         image_url = data["urls"]["regular"]  # raw, full, regular, small, thumb
-        print("Random sleep landscape image URL:", image_url)
         break
     if response.status_code != 200 and _i == retryCount-1:
         exit
@@ -278,7 +283,7 @@ part2 = MIMEText(f"""\
 <html>
     <body>
         <h1>Its time to rest!</h1>
-        <p>Kindly wait for image to load...</p>
+        <p style='color:#888;'>Kindly wait for image to load...</p>
         <hr>
             <p><img src="cid:testimage" alt="Get better internet my guy."></p>
         <hr>
