@@ -48,7 +48,7 @@ def fetch_subreddit(subreddit, token, limit=3):
     for post in res.json()["data"]["children"]:
         title = post["data"]["title"]
         selftext = post["data"].get("selftext", "")
-        description = (selftext[:200] + "...") if selftext else "No description"
+        description = (selftext[:420] + "...") if selftext else "No description"
         post_url = "https://reddit.com" + post["data"]["permalink"]
         posts.append([title, description, post_url])
     return posts
@@ -183,7 +183,8 @@ response = requests.get(url, headers=headers, params=params)
 for _i in range(retryCount):
     if response.status_code == 200:
         data = response.json()
-        image_url = data["urls"]["regular"]  # raw, full, regular, small, thumb
+        image_url = data["urls"]["raw"]  # raw, full, regular, small, thumb
+        image_url = f"{image_url}&w=800&h=600&fit=crop&q=80"
         break
     if response.status_code != 200 and _i == retryCount-1:
         exit
@@ -231,18 +232,14 @@ print("Edited Image")
 
 # Get links/embeds
 button_style = (
-    "display:inline-block;"
-    "padding:10px 20px;"
-    "background-color:#FF4500;"
-    "color:white;"
-    "text-decoration:none;"
-    "border-radius:5px;"
-    "font-weight:bold;"
+    "background:#FF4500;    "
+    "color:#FFFFFF;         "
+    "border-radius:5px;     "
+    "padding:8px 16px;      "
+    "text-decoration:none;  "
 )
 
 SubredditData = []
-SubredditsOld = ["https://old.reddit.com/r/AmItheAsshole", "https://old.reddit.com/r/pettyrevenge", "https://old.reddit.com/r/relationships"]
-SubredditsNew = ["https://www.reddit.com/r/AmItheAsshole", "https://www.reddit.com/r/pettyrevenge", "https://www.reddit.com/r/relationships"]
 
 SubredditNames = ["r/AmItheAsshole", "r/pettyrevenge", "r/relationships"]
 token = get_reddit_token()
@@ -250,19 +247,24 @@ print("Got Token")
 for Sr in SubredditNames:
     SubredditData.append(fetch_subreddit(Sr, token))
 
-print(SubredditData)
 
-linktext = f"<p style='color:#888;'>Digest generated at {datetime.now()}</p>"
+linktext = f"<p style='color:#888;'>Digest generated on {datetime.now().strftime('%d/%m/%Y at %H:%M:%S')}</p>"
 for i in range(len(SubredditData)):
-    linktext+=f"<h2>{SubredditNames[i]}</h2>\n"
+    linktext += f"""
+    <h2 style="color:#FF4500;">{SubredditNames[i]}</h2>
+    """
     for j in SubredditData[i]:
-        linktext += f"""\
-                    <h3>{j[0]}</h3>
-                    <p>{j[1]}</p>
-                    <a href="{j[2]}" style="{button_style}">Read More</a>
-                    <br>
-                    """
-    linktext+="\n<hr>\n"
+        linktext += f"""
+        <div style="border:1px solid #D7DADC; border-radius:6px; padding-left:15px; padding-top:0px; padding-bottom:25px; margin-bottom:20px;">
+            <h3 style="color:#1A1A1B; margin-left:10px; margin-top: 10px;">{j[0]}</h3>
+            <div style="margin-left:20px;">
+                <p style="color:#7C7C7C;">{j[1]}</p>
+                <a href="{j[2]}" style="{button_style}">Read More</a>
+            </div>
+        </div>
+        """
+    linktext += "<hr style='border:0; height:1px; background:#D7DADC;'>\n"
+
 print("Got links")
 
 # Send mail
@@ -270,16 +272,28 @@ part1 = MIMEText("Hello! This is a test email.\n\n" + quote)
 
 part2 = MIMEText(f"""\
 <html>
-    <body>
-        <h1>Its time to rest!</h1>
-        <p style='color:#888;'>Kindly wait for image to load...</p>
-        <hr>
-            <p><img src="cid:testimage" alt="Get better internet my guy."></p>
-        <hr>
-        <h1>Top articles across reddit [{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}]</h1>
-            <hr>
+    <body style="margin:0; padding:0; background:#F8F9FA; font-family:Arial, Helvetica, sans-serif; color:#1A1A1B;">
+        <div style="max-width:800px; margin:auto; background-color:transparent; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+                 
+            <h1 style='color:#FF4500; background-color:transparent;'>You deserve a break!</h1>
+            <p style='color:#7C7C7C; background-color:transparent;'>Kindly wait for image to load...</p>
+                 
+            <hr style="border:0; height:1px; background-color:transparent;">
+                <p><img src="cid:testimage" alt="Get better internet my guy."></p>
+            <hr style="border:0; height:1px; background-color:transparent;">
+                 
+            <h1 style='color:#FF4500; background-color:transparent;'>Daily Drama Digest</h1>
+            <hr style="border:0; height:1px; background-color:transparent;">
             {linktext}
-        <br>
+            <br>
+
+            <div style="background:#F1F1F1; padding:15px; text-align:center; font-size:12px; color:#7C7C7C;">
+                <p style="margin:0;">You're receiving this because you have subscribed to a service made by Vivaan (what were you thinking?)</p>
+                <p style="margin:5px 0 0;">
+                <a href="#" style="color:#FF4500; text-decoration:none;">Unsubscribe</a>
+                </p>
+            </div>
+        </div>
     </body>
 </html>
 """, "html")
