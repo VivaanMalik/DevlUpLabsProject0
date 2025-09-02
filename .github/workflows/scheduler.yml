@@ -15,6 +15,10 @@ jobs:
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}
+      REDDIT_API_SECRET: ${{ secrets.REDDIT_API_SECRET }}
+      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+      REDDIT_USER: ${{ secrets.REDDIT_USER }}
+      REDDIT_PASS: ${{ secrets.REDDIT_PASS }}
 
     steps:
       - name: Checkout repo

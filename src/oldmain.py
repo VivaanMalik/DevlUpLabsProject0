@@ -19,42 +19,81 @@ receiver = os.getenv("TEMP_RECIEVER")
 password = os.getenv("EMAIL_PASS")
 unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
 imurlthing = os.getenv("IMAGE_URL")
-REDDIT_API_SECRET = os.getenv("REDDIT_API_SECRET")
-REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
-REDDIT_USER = os.getenv("REDDIT_USER")
-REDDIT_PASS = os.getenv("REDDIT_PASS")
-
-
-def get_reddit_token():
-    auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, REDDIT_API_SECRET)
-    data = {
-        "grant_type": "password",
-        "username": REDDIT_USER,
-        "password": REDDIT_PASS
-    }
-    headers = {"User-Agent": "reddit-digest-script/0.1"}
-    res = requests.post("https://www.reddit.com/api/v1/access_token",
-                        auth=auth, data=data, headers=headers)
-    res.raise_for_status()
-    return res.json()["access_token"]
-
-def fetch_subreddit(subreddit, token, limit=3):
-    headers = {"Authorization": f"bearer {token}",
-               "User-Agent": "reddit-digest-script/0.1"}
-    url = f"https://oauth.reddit.com/{subreddit}/top?t=day&limit={limit}"
-    res = requests.get(url, headers=headers)
-    res.raise_for_status()
-    posts = []
-    for post in res.json()["data"]["children"]:
-        title = post["data"]["title"]
-        selftext = post["data"].get("selftext", "")
-        description = (selftext[:200] + "...") if selftext else "No description"
-        post_url = "https://reddit.com" + post["data"]["permalink"]
-        posts.append([title, description, post_url])
-    return posts
 
 url = "https://api.unsplash.com/photos/random"
 retryCount = 3
+
+def getRedditJSON(url):
+    headers_for_reddit = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    out = []
+    res = requests.get(url, headers=headers_for_reddit)
+    if res.status_code == 200:
+        data = res.json()["data"]["children"]
+        print(data)
+        for post in data:
+            title = post["data"]["title"]
+            selftext = post["data"].get("selftext", "")
+            description = (selftext[:200] + "...") if selftext else "No description"
+            post_url = "https://reddit.com" + post["data"]["permalink"]
+            out.append([title, description, post_url])
+    else:
+        print("Error:", res.status_code)
+        return None
+    return out
+
+def scrapeReddit(url):
+    headers_for_reddit = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    for _i in range(retryCount):
+        res = requests.get(url, headers=headers_for_reddit)
+        if res.status_code == 200:
+            break
+        if res.status_code != 200 and _i == retryCount:
+            print("Error:", res.status_code, res.text)
+            return None
+    
+    soup = BeautifulSoup(res.text, "html.parser")
+    posts = soup.find_all("div", {"class": "thing"}, limit=3)
+    
+    data = []
+    for post in posts:
+        title_tag = post.find("a", class_="title")
+        title = title_tag.get_text(strip=True) if title_tag else "No title"
+
+        post_url = title_tag['href'] if title_tag else None
+        if post_url and post_url.startswith("/r/"):
+            post_url = "https://old.reddit.com" + post_url
+
+        # Visit the post URL to get full text
+        description = "No description found"
+        if post_url:
+            res_post = requests.get(post_url, headers=headers)
+            if res_post.status_code == 200:
+                soup_post = BeautifulSoup(res_post.text, "html.parser")
+                usertext_divs = soup_post.find_all("div", class_="usertext-body")
+                if usertext_divs:
+                    # print(len(usertext_divs))
+                    usertext_div = usertext_divs[1]
+                    md_div = usertext_div.find("div", class_="md")
+                    if md_div:
+                        paragraphs = md_div.find_all("p")
+                        description = paragraphs[0].get_text(strip=True)
+                        if len(paragraphs)>1:
+                            description+="..."
+
+        post_url = post_url.replace("https://old", "https://www")
+
+        data.append([title, description, post_url])
+    return data
 
 quotes = [
     "Procrastinate now,\npay later.",
@@ -241,14 +280,16 @@ button_style = (
 )
 
 SubredditData = []
-SubredditsOld = ["https://old.reddit.com/r/AmItheAsshole", "https://old.reddit.com/r/pettyrevenge", "https://old.reddit.com/r/relationships"]
-SubredditsNew = ["https://www.reddit.com/r/AmItheAsshole", "https://www.reddit.com/r/pettyrevenge", "https://www.reddit.com/r/relationships"]
+Subreddits = ["https://old.reddit.com/r/AmItheAsshole/top/?t=day", "https://old.reddit.com/r/pettyrevenge/top/?t=day", "https://old.reddit.com/r/relationships/top/?t=day"]
+SubredditsJSON = [
+    "https://www.reddit.com/r/AmItheAsshole/top/.json?t=day&limit=3",
+    "https://www.reddit.com/r/pettyrevenge/top/.json?t=day&limit=3",
+    "https://www.reddit.com/r/relationships/top/.json?t=day&limit=3"
+]
 
 SubredditNames = ["r/AmItheAsshole", "r/pettyrevenge", "r/relationships"]
-token = get_reddit_token()
-print("Got Token")
-for Sr in SubredditNames:
-    SubredditData.append(fetch_subreddit(Sr, token))
+for Sr in SubredditsJSON:
+    SubredditData.append(getRedditJSON(Sr))
 
 print(SubredditData)
 
