@@ -10,6 +10,7 @@ import io, base64
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 load_dotenv()
 
@@ -281,7 +282,7 @@ part2 = MIMEText(f"""
         <hr>
             <p><img src="cid:testimage" alt="Get better internet my guy."></p>
         <hr>
-        <h1>Top articles across reddit</h1>
+        <h1>Top articles across reddit [{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}]</h1>
             <hr>
             {linktext}
         <br>
