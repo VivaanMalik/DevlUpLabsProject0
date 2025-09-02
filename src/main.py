@@ -264,7 +264,7 @@ for i in range(len(SubredditData)):
         linktext += f""" 
                     <h3>{j[0]}</h3>
                     <p>{j[1]}</p>
-                    <a href={j[2]} style="{button_style}">Read More</a>
+                    <a href="{j[2]}" style="{button_style}">Read More</a>
                     <br>
                     """
     linktext+="\n<hr>\n"
