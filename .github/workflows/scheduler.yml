@@ -19,6 +19,8 @@ jobs:
       REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
       REDDIT_USER: ${{ secrets.REDDIT_USER }}
       REDDIT_PASS: ${{ secrets.REDDIT_PASS }}
+      SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+      SERVICE_ACC_KEY: ${{ secrets.SERVICE_ACC_KEY }}
 
     steps:
       - name: Checkout repo

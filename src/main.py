@@ -29,8 +29,13 @@ try:
     creds = json.loads(SERVICE_ACC_KEY)
     gc = gspread.service_account_from_dict(creds)
 except:
-    creds = json.loads(SERVICE_ACC_KEY)
-    gc = gspread.service_account_from_dict(creds)
+    path = "./src/cred.json"
+    if (os.path.isfile(path)):
+        print("gang gang")
+    else:
+        print("no gang gang")
+    gc = gspread.service_account(filename=path)
+
 spreadsheet_id = os.getenv("SPREADSHEET_ID")
 sh = gc.open_by_key(spreadsheet_id)
 ws = sh.sheet1
@@ -318,7 +323,7 @@ part3.add_header("Content-ID", "<testimage>")
 msg = MIMEMultipart('related')
 msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
 msg["From"] = sender
-msg["To"] = receiver
+# msg["To"] = receiver
 alt = MIMEMultipart('alternative')
 alt.attach(part1)
 alt.attach(part2)
@@ -327,7 +332,9 @@ msg.attach(alt)
 msg.attach(part3)
 print("Prepped mail")
 
-with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-    server.login(sender, password)
-    server.send_message(msg)
+for i in records:
+    msg["To"]=i["Email ID"]
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender, password)
+        server.send_message(msg)
 print("Sent mail")
