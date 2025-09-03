@@ -9,8 +9,9 @@ from dotenv import load_dotenv
 import io, base64
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-from bs4 import BeautifulSoup
 from datetime import datetime
+import json
+import gspread
 
 load_dotenv()
 
@@ -23,7 +24,18 @@ REDDIT_API_SECRET = os.getenv("REDDIT_API_SECRET")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_USER = os.getenv("REDDIT_USER")
 REDDIT_PASS = os.getenv("REDDIT_PASS")
-
+SERVICE_ACC_KEY=os.getenv("SERVICE_ACC_KEY")
+try:
+    creds = json.loads(SERVICE_ACC_KEY)
+    gc = gspread.service_account_from_dict(creds)
+except:
+    creds = json.loads(SERVICE_ACC_KEY)
+    gc = gspread.service_account_from_dict(creds)
+spreadsheet_id = os.getenv("SPREADSHEET_ID")
+sh = gc.open_by_key(spreadsheet_id)
+ws = sh.sheet1
+records = ws.get_all_records()
+print(records)
 
 def get_reddit_token():
     auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, REDDIT_API_SECRET)
@@ -232,7 +244,7 @@ print("Edited Image")
 
 # Get links/embeds
 button_style = (
-    "background:#FF4500;    "
+    "background:#{highlight_color};    "
     "color:#FFFFFF;         "
     "border-radius:5px;     "
     "padding:8px 16px;      "
@@ -247,15 +259,17 @@ print("Got Token")
 for Sr in SubredditNames:
     SubredditData.append(fetch_subreddit(Sr, token))
 
+highlight_color = "FF4500"
+
 
 linktext = f"<p style='color:#888;'>Digest generated on {datetime.now().strftime('%d/%m/%Y at %H:%M:%S')}</p>"
 for i in range(len(SubredditData)):
     linktext += f"""
-    <h2 style="color:#FF4500;">{SubredditNames[i]}</h2>
+    <h2 style="color:#{highlight_color};">{SubredditNames[i]}</h2>
     """
     for j in SubredditData[i]:
         linktext += f"""
-        <div style="border:1px solid #D7DADC; border-radius:6px; padding-left:15px; padding-top:0px; padding-bottom:25px; margin-bottom:20px;">
+        <div style="border:1px solid #D7DADC; border-radius:6px; padding-left:15px; padding-top:0px; padding-bottom:25px; margin:10px 20px 10px 20px;">
             <h3 style="color:#1A1A1B; margin-left:10px; margin-top: 10px;">{j[0]}</h3>
             <div style="margin-left:20px;">
                 <p style="color:#7C7C7C;">{j[1]}</p>
@@ -275,14 +289,14 @@ part2 = MIMEText(f"""\
     <body style="margin:0; padding:0; background:#F8F9FA; font-family:Arial, Helvetica, sans-serif; color:#1A1A1B;">
         <div style="max-width:800px; margin:auto; background-color:transparent; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
                  
-            <h1 style='color:#FF4500; background-color:transparent;'>You deserve a break!</h1>
+            <h1 style='color:#{highlight_color}; background-color:transparent;'>You deserve a break!</h1>
             <p style='color:#7C7C7C; background-color:transparent;'>Kindly wait for image to load...</p>
                  
             <hr style="border:0; height:1px; background-color:transparent;">
-                <p><img src="cid:testimage" alt="Get better internet my guy."></p>
+                <p><img src="cid:testimage" alt="Get better internet my guy." style="max-width: 100%; height: auto;"></p>
             <hr style="border:0; height:1px; background-color:transparent;">
                  
-            <h1 style='color:#FF4500; background-color:transparent;'>Daily Drama Digest</h1>
+            <h1 style='color:#{highlight_color}; background-color:transparent;'>Daily Drama Digest</h1>
             <hr style="border:0; height:1px; background-color:transparent;">
             {linktext}
             <br>
@@ -290,7 +304,7 @@ part2 = MIMEText(f"""\
             <div style="background:#F1F1F1; padding:15px; text-align:center; font-size:12px; color:#7C7C7C;">
                 <p style="margin:0;">You're receiving this because you have subscribed to a service made by Vivaan (what were you thinking?)</p>
                 <p style="margin:5px 0 0;">
-                <a href="#" style="color:#FF4500; text-decoration:none;">Unsubscribe</a>
+                <a href="#" style="color:#{highlight_color}; text-decoration:none;">Unsubscribe</a>
                 </p>
             </div>
         </div>
