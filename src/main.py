@@ -339,8 +339,10 @@ if __name__ == "__main__":
 
 for i in records:
     msg["To"]=i["Email ID"]
-    print(i["Email ID"])
+    for j in i["Email ID"]:
+        print(j+" ", end="")
+    print()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(sender, password)
         server.send_message(msg)
-print("Sent mail")
+    print("Sent mail to "+i["Email ID"])
