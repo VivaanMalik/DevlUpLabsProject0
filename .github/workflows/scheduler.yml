@@ -21,7 +21,8 @@ jobs:
       REDDIT_PASS: ${{ secrets.REDDIT_PASS }}
       SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
       SERVICE_ACC_KEY: ${{ secrets.SERVICE_ACC_KEY }}
-
+      UNSUBSCRIBE_SHEET_ID: ${{ secrets.UNSUBSCRIBE_SHEET_ID }}
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
