@@ -10,9 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Show payload
-        run: echo "Answers: ${{ toJSON(github.event.client_payload.answers) }}"
-
       - name: Run Python with form data
         run: |
           python src/main.py "${{ github.event.client_payload['Email ID'] }}"
