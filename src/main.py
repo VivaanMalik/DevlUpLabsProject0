@@ -12,6 +12,7 @@ import numpy as np
 from datetime import datetime
 import json
 import gspread
+import sys
 
 load_dotenv()
 
@@ -331,6 +332,10 @@ alt.attach(part2)
 msg.attach(alt)
 msg.attach(part3)
 print("Prepped mail")
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        records = [{"Email ID":sys.argv[1]}]
 
 for i in records:
     msg["To"]=i["Email ID"]
