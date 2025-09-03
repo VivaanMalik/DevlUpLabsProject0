@@ -39,7 +39,7 @@ except:
     gc = gspread.service_account(filename=path)
 
 unsubscribe_sheet = gc.open_by_key(UNSUBSCRIBE_SHEET_ID).sheet1
-unsubscribed = [row["Email"] for row in unsubscribe_sheet.get_all_records()]
+unsubscribed = [row["Email Address"] for row in unsubscribe_sheet.get_all_records()]
 
 spreadsheet_id = os.getenv("SPREADSHEET_ID")
 sh = gc.open_by_key(spreadsheet_id)
