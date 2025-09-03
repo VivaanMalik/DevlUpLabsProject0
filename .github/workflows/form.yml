@@ -15,4 +15,4 @@ jobs:
 
       - name: Run Python with form data
         run: |
-          python src/main.py "${{ github.event.client_payload.answers[2] }}"
+          python src/main.py "${{ github.event.client_payload['Email ID'] }}"
