@@ -26,6 +26,7 @@ REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_USER = os.getenv("REDDIT_USER")
 REDDIT_PASS = os.getenv("REDDIT_PASS")
 SERVICE_ACC_KEY=os.getenv("SERVICE_ACC_KEY")
+UNSUBSCRIBE_SHEET_ID=os.getenv("UNSUBSCRIBE_SHEET_ID")
 try:
     creds = json.loads(SERVICE_ACC_KEY)
     gc = gspread.service_account_from_dict(creds)
@@ -36,6 +37,9 @@ except:
     else:
         print("no gang gang")
     gc = gspread.service_account(filename=path)
+
+unsubscribe_sheet = gc.open_by_key(UNSUBSCRIBE_SHEET_ID).sheet1
+unsubscribed = [row["Email"] for row in unsubscribe_sheet.get_all_records()]
 
 spreadsheet_id = os.getenv("SPREADSHEET_ID")
 sh = gc.open_by_key(spreadsheet_id)
@@ -310,7 +314,7 @@ part2 = MIMEText(f"""\
             <div style="background:#F1F1F1; padding:15px; text-align:center; font-size:12px; color:#7C7C7C;">
                 <p style="margin:0;">You're receiving this because you have subscribed to a service made by Vivaan (what were you thinking?)</p>
                 <p style="margin:5px 0 0;">
-                <a href="#" style="color:#{highlight_color}; text-decoration:none;">Unsubscribe</a>
+                <a href="https://forms.gle/6hT996TGtN2bWsow9" style="color:#{highlight_color}; text-decoration:none;">Unsubscribe</a>
                 </p>
             </div>
         </div>
@@ -338,6 +342,8 @@ if __name__ == "__main__":
         records = [{"Email ID":sys.argv[1]}]
 
 for i in records:
+    if i["Email ID"] in unsubscribed:
+        break
     msg["To"]=i["Email ID"]
     for j in i["Email ID"]:
         print(j+" ", end="")
