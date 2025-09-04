@@ -253,13 +253,8 @@ img_str = base64.b64encode(buffer.read()).decode("utf-8")
 print("Edited Image")
 
 # Get links/embeds
-button_style = (
-    "background:#{highlight_color};    "
-    "color:#FFFFFF;         "
-    "border-radius:5px;     "
-    "padding:8px 16px;      "
-    "text-decoration:none;  "
-)
+highlight_color = "FF4500"
+button_style = "background:#{highlight_color}; color:#FFFFFF; border-radius:5px; padding:8px 16px; text-decoration:none;"
 
 SubredditData = []
 
@@ -268,9 +263,6 @@ token = get_reddit_token()
 print("Got Token")
 for Sr in SubredditNames:
     SubredditData.append(fetch_subreddit(Sr, token))
-
-highlight_color = "FF4500"
-
 
 linktext = f"<p style='color:#888;'>Digest generated on {datetime.now().strftime('%d/%m/%Y at %H:%M:%S')}</p>"
 for i in range(len(SubredditData)):
