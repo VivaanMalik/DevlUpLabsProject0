@@ -254,7 +254,7 @@ print("Edited Image")
 
 # Get links/embeds
 highlight_color = "FF4500"
-button_style = "background:#{highlight_color}; color:#FFFFFF; border-radius:5px; padding:8px 16px; text-decoration:none;"
+button_style = f"background:#{highlight_color}; color:#FFFFFF; border-radius:5px; padding:8px 16px; text-decoration:none;"
 
 SubredditData = []
 
