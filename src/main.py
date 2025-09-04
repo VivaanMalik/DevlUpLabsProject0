@@ -325,26 +325,25 @@ part2 = MIMEText(f"""\
 part3 = MIMEImage(buffer.getvalue(), _subtype="png")
 part3.add_header("Content-ID", "<testimage>")
 
-msg = MIMEMultipart('related')
-msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
-msg["From"] = sender
-# msg["To"] = receiver
-alt = MIMEMultipart('alternative')
-alt.attach(part1)
-alt.attach(part2)
-
-msg.attach(alt)
-msg.attach(part3)
-print("Prepped mail")
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         records = [{"Email ID":sys.argv[1]}]
 
 for i in records:
     if i["Email ID"] in unsubscribed:
-        break
+        continue
+
+    msg = MIMEMultipart('related')
+    msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
+    msg["From"] = sender
     msg["To"]=i["Email ID"]
+    alt = MIMEMultipart('alternative')
+    alt.attach(part1)
+    alt.attach(part2)
+
+    msg.attach(alt)
+    msg.attach(part3)
+    print("Prepped mail for "+i["Email ID"])
     for j in i["Email ID"]:
         print(j+" ", end="")
     print()
