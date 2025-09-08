@@ -314,8 +314,6 @@ part3 = MIMEImage(buffer.getvalue(), _subtype="png")
 part3.add_header("Content-ID", "<testimage>")
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        records = [{"Email Address":sys.argv[1]}]
     mailed_list = []
     for i in records:
         if i["Email Address"] in mailed_list:
@@ -326,6 +324,8 @@ if __name__ == "__main__":
             else:
                 print("ERROROROROROROOR 1")
         mailed_list.append(i["Email Address"])
+    if len(sys.argv) > 1:
+        records = [{"Email Address":sys.argv[1]}]
 
 for i in records:
 
