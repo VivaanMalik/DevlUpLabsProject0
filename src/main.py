@@ -17,7 +17,7 @@ import sys
 load_dotenv()
 
 sender = os.getenv("EMAIL_USER")
-receiver = os.getenv("TEMP_RECIEVER")
+# receiver = os.getenv("TEMP_RECIEVER")
 password = os.getenv("EMAIL_PASS")
 unsplashAccessKey = os.getenv("UNSPLASH_ACCESS_KEY")
 imurlthing = os.getenv("IMAGE_URL")

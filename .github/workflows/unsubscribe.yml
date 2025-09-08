@@ -25,13 +25,6 @@ jobs:
           run: |
             pip install -r requirements.txt || pip install requests python-dotenv pillow numpy
 
-        - name: Debug secrets
-          run: |
-            echo "EMAIL_USER: ${{ secrets.EMAIL_USER }}"
-            echo "EMAIL_PASS: ${{ secrets.EMAIL_PASS }}"
-            echo "UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}"
-            echo "TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}"
-
         - name: Run script
           run: |
             python src/unsoobscribe.py "${{ github.event.client_payload['Email Address'] }}"

@@ -13,7 +13,6 @@ jobs:
         IMAGE_URL: ${{ secrets.IMAGE_URL }}
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
         EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-        TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}
         REDDIT_API_SECRET: ${{ secrets.REDDIT_API_SECRET }}
         REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
         REDDIT_USER: ${{ secrets.REDDIT_USER }}
@@ -34,13 +33,6 @@ jobs:
         - name: Install dependencies
           run: |
             pip install -r requirements.txt || pip install requests python-dotenv pillow numpy
-
-        - name: Debug secrets
-          run: |
-            echo "EMAIL_USER: ${{ secrets.EMAIL_USER }}"
-            echo "EMAIL_PASS: ${{ secrets.EMAIL_PASS }}"
-            echo "UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}"
-            echo "TEMP_RECIEVER: ${{ secrets.TEMP_RECIEVER }}"
 
         - name: Run script
           run: |
