@@ -26,7 +26,6 @@ REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_USER = os.getenv("REDDIT_USER")
 REDDIT_PASS = os.getenv("REDDIT_PASS")
 SERVICE_ACC_KEY=os.getenv("SERVICE_ACC_KEY")
-UNSUBSCRIBE_SHEET_ID=os.getenv("UNSUBSCRIBE_SHEET_ID")
 try:
     creds = json.loads(SERVICE_ACC_KEY)
     gc = gspread.service_account_from_dict(creds)
@@ -37,9 +36,6 @@ except:
     else:
         print("no gang gang")
     gc = gspread.service_account(filename=path)
-
-unsubscribe_sheet = gc.open_by_key(UNSUBSCRIBE_SHEET_ID).sheet1
-unsubscribed = [row["Email Address"] for row in unsubscribe_sheet.get_all_records()]
 
 spreadsheet_id = os.getenv("SPREADSHEET_ID")
 sh = gc.open_by_key(spreadsheet_id)
