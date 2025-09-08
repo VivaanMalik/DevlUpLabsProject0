@@ -306,7 +306,7 @@ part2 = MIMEText(f"""\
             <div style="background:#F1F1F1; padding:15px; text-align:center; font-size:12px; color:#7C7C7C;">
                 <p style="margin:0;">You're receiving this because you have subscribed to a service made by Vivaan (what were you thinking?)</p>
                 <p style="margin:5px 0 0;">
-                <a href="https://forms.gle/6hT996TGtN2bWsow9" style="color:#{highlight_color}; text-decoration:none;">Unsubscribe</a>
+                <a href="https://forms.gle/QUj4uw71MMHqEgJG9" style="color:#{highlight_color}; text-decoration:none;">Unsubscribe</a>
                 </p>
             </div>
         </div>

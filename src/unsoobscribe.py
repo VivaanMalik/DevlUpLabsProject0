@@ -27,6 +27,9 @@ print(records)
 if len(sys.argv) > 1:
     EmailToDelet = sys.argv[1]
     cell = ws.find(EmailToDelet)
+    for j in EmailToDelet:
+        print(j+" ", end="")
+    print()
     if cell:
         ws.delete_rows(cell.row)
         print("Deleted " + EmailToDelet)
