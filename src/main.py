@@ -325,7 +325,7 @@ if __name__ == "__main__":
                 print("Deleted " + i["Email Address"])
             else:
                 print("ERROROROROROROOR 1")
-            mailed_list.append(i["Email Address"])
+        mailed_list.append(i["Email Address"])
 
 for i in records:
 
