@@ -1,4 +1,4 @@
-name: Run on Form Submission
+name: Run on unsoobscribe
 
 on:
   repository_dispatch:
