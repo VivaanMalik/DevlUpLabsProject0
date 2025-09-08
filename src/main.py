@@ -330,7 +330,7 @@ if __name__ == "__main__":
 for i in records:
 
     msg = MIMEMultipart('related')
-    msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
+    msg["Subject"] = "Daily Dose of Unmotivation"
     msg["From"] = sender
     msg["To"]=i["Email Address"]
     alt = MIMEMultipart('alternative')
