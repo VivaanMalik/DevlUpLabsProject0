@@ -326,6 +326,7 @@ if __name__ == "__main__":
         mailed_list.append(i["Email Address"])
     if len(sys.argv) > 1:
         records = [{"Email Address":sys.argv[1]}]
+        sys.exit(0)
 
 for i in records:
 
