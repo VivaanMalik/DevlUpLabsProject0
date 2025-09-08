@@ -316,12 +316,18 @@ part3.add_header("Content-ID", "<testimage>")
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         records = [{"Email Address":sys.argv[1]}]
-
-mailed_list = []
+    mailed_list = []
+    for i in records:
+        if i["Email Address"] in mailed_list:
+            cell = ws.find(i["Email Address"])
+            if cell:
+                ws.delete_rows(cell.row)
+                print("Deleted " + i["Email Address"])
+            else:
+                print("ERROROROROROROOR 1")
+            mailed_list.append(i["Email Address"])
 
 for i in records:
-    if i["Email Address"] in mailed_list:
-        continue
 
     msg = MIMEMultipart('related')
     msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
@@ -333,7 +339,6 @@ for i in records:
 
     msg.attach(alt)
     msg.attach(part3)
-    mailed_list.append(i["Email Address"])
     print("Prepped mail for "+i["Email Address"])
     for j in i["Email Address"]:
         print(j+" ", end="")
