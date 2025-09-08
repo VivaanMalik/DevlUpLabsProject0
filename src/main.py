@@ -319,27 +319,27 @@ part3.add_header("Content-ID", "<testimage>")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        records = [{"Email ID":sys.argv[1]}]
+        records = [{"Email Address":sys.argv[1]}]
 
 for i in records:
-    if i["Email ID"] in unsubscribed:
-        continue
+    # if i["Email Address"] in unsubscribed:
+    #     continue
 
     msg = MIMEMultipart('related')
     msg["Subject"] = "⚠️⚠️⚠️LOOK AT THIS VERY LEGIT LOOKING MAIL⚠️⚠️⚠️"
     msg["From"] = sender
-    msg["To"]=i["Email ID"]
+    msg["To"]=i["Email Address"]
     alt = MIMEMultipart('alternative')
     alt.attach(part1)
     alt.attach(part2)
 
     msg.attach(alt)
     msg.attach(part3)
-    print("Prepped mail for "+i["Email ID"])
-    for j in i["Email ID"]:
+    print("Prepped mail for "+i["Email Address"])
+    for j in i["Email Address"]:
         print(j+" ", end="")
     print()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(sender, password)
         server.send_message(msg)
-    print("Sent mail to "+i["Email ID"])
+    print("Sent mail to "+i["Email Address"])
