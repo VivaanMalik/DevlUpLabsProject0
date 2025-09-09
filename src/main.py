@@ -267,7 +267,7 @@ for i in range(len(SubredditData)):
     """
     for j in SubredditData[i]:
         linktext += f"""
-        <div style="border:1px solid #D7DADC; border-radius:6px; padding-left:15px; padding-top:0px; padding-bottom:25px; margin:10px 20px 10px 20px;">
+        <div style="border:1px solid #D7DADC; border-radius:6px; padding-left:15px; padding-right:15px; padding-top:0px; padding-bottom:25px; margin:10px 20px 10px 20px;">
             <h3 style="color:#1A1A1B; margin-left:10px; margin-right:10px; margin-top: 10px;">{j[0]}</h3>
             <div style="margin-left:20px;">
                 <p style="color:#7C7C7C;">{j[1]}</p>
